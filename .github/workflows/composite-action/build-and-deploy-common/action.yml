@@ -1,9 +1,49 @@
 name: Common configuration
 description: Run jobs common for both platforms (Android and iOS)
 
+inputs:
+  env_1:
+    required: true
+  env_2:
+    required: true
+  env_3:
+    required: true
+
 runs:
   using: 'composite'
   steps:
     - name: Run common
       shell: bash
       run: echo "I'm on common configuration"
+
+    - name: Setup node
+      shell: bash
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
+    - name: Configure envs
+      run: |
+        touch .env
+        echo ENV_1=${{ inputs.ENV_1 }} > .env
+        echo ENV_2=${{ inputs.ENV_2 }} >> .env
+        echo ENV_3=${{ inputs.ENV_3 }} >> .env
+        cat .env
+
+    - name: Get yarn cache directory path
+      shell: bash
+      id: yarn-cache-dir-path
+      run: echo dir=$(yarn cache dir) >> $GITHUB_OUTPUT
+
+    - name: Restore node_modules from cache
+      shell: bash
+      uses: actions/cache@v4
+      id: yarn-cache
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: ${{ runner.os }}-yarn-
+
+    - name: Install yarn dependencies
+      shell: bash
+      run: yarn install --frozen-lockfile

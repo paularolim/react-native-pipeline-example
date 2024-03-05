@@ -31,6 +31,10 @@ jobs:
 
       - name: Run for common platforms
         uses: ./.github/workflows/composite-action/build-and-deploy-common/
+        with:
+          env_1: ${{ secrets.ENV_1 }}
+          env_2: ${{ secrets.ENV_2 }}
+          env_3: ${{ secrets.ENV_3 }}
 
       - name: Run for Android
         if: inputs.build_platform != 'ios'
