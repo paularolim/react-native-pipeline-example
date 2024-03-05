@@ -5,4 +5,4 @@ runs:
   using: 'composite'
   steps:
     - name: Run for Android
-      run: echo 'I'm on Android configuration'
+      run: echo "I'm on Android configuration"

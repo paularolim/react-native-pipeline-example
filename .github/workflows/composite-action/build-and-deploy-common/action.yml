@@ -4,5 +4,5 @@ description: Run jobs common for both platforms (Android and iOS)
 runs:
   using: 'composite'
   steps:
-    - name: Checkout...
-      uses: actions/checkout@v4
+    - name: Run common
+      run: echo "I'm on common configuration"

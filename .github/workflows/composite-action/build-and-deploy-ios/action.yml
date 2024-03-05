@@ -5,4 +5,4 @@ runs:
   using: 'composite'
   steps:
     - name: Run for iOS
-      run: echo 'I'm on iOS configuration'
+      run: echo "I'm on iOS configuration"
