@@ -91,7 +91,7 @@ jobs:
         if: inputs.build_platform != 'ios'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.ref_name }}-${{ github.workflow_ref }}
+          name: ${{ github.ref_name }}-${{ github.workflow_sha }}
           path: android/app/build/outputs/apk/release/app-release.apk
 
       - name: Setup ruby
@@ -129,11 +129,11 @@ jobs:
           export-method: development
           configuration: Release
           scheme: PipelineExample
-          output-path: ${{ github.ref_name }}-${{ github.workflow_ref }}.ipa
+          output-path: ${{ github.ref_name }}-${{ github.workflow_sha }}.ipa
 
       - name: Upload iOS artifact
         if: inputs.build_platform != 'android'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.ref_name }}-${{ github.workflow_ref }}
-          path: ${{ github.ref_name }}-${{ github.workflow_ref }}.ipa
+          name: ${{ github.ref_name }}-${{ github.workflow_sha }}
+          path: ${{ github.ref_name }}-${{ github.workflow_sha }}.ipa
