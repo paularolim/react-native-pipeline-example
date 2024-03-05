@@ -17,7 +17,7 @@ jobs:
       name: ${{ (github.ref_name == 'main') && 'production' || 'development' }}
 
     steps:
-      - name: Checkout on branch ${{ github.ref_name }} with environment ${{ github.event.deployment.environment }}
+      - name: Checkout on branch ${{ github.ref_name }} with environment ${{ (github.ref_name == 'main') && 'production' || 'development' }}
         uses: actions/checkout@v4
 
       - name: Setup node
@@ -28,9 +28,9 @@ jobs:
       - name: Configure envs
         run: |
           touch .env
-          echo ENV_1=${{ github.event.deployment.ENV_1 }} > .env
-          echo ENV_2=${{ github.event.deployment.ENV_2 }} >> .env
-          echo ENV_3=${{ github.event.deployment.ENV_3 }} >> .env
+          echo ENV_1=${{ secrets.ENV_1 }} > .env
+          echo ENV_2=${{ secrets.ENV_2 }} >> .env
+          echo ENV_3=${{ secrets.ENV_3 }} >> .env
           cat .env
 
           - name: Get yarn cache directory path
