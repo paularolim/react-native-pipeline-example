@@ -27,12 +27,12 @@ jobs:
 
     steps:
       - name: Run for common platforms
-        uses: ./.github/workflows/composite-action/build-and-deploy-common.yml
+        uses: ./.github/workflows/composite-action/build-and-deploy-common/
 
       - name: Run for Android
         if: inputs.build_platform != 'ios'
-        uses: ./.github/workflows/composite-action/build-and-deploy-android.yml
+        uses: ./.github/workflows/composite-action/build-and-deploy-android/
 
       - name: Run for iOS
         if: inputs.build_platform != 'android'
-        uses: ./.github/workflows/composite-action/build-and-deploy-ios.yml
+        uses: ./.github/workflows/composite-action/build-and-deploy-ios/
