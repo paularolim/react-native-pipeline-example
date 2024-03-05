@@ -2,6 +2,15 @@ name: Build and deploy app
 
 on:
   workflow_dispatch:
+    inputs:
+      build_platform:
+        description: 'Choose if the action build for Android, iOS or both'
+        default: 'both'
+        type: choice
+        options:
+          - 'android'
+          - 'ios'
+          - 'both'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -11,7 +20,7 @@ jobs:
   deploy-app:
     name: Deploy app
 
-    runs-on: macOS-latest
+    runs-on: ${{ inputs.build_platform == 'android' && 'ubuntu-latest' || 'macOS-latest' }}
 
     environment:
       name: ${{ (github.ref_name == 'main') && 'production' || 'development' }}
@@ -47,3 +56,40 @@ jobs:
 
       - name: Install yarn dependencies
         run: yarn install --frozen-lockfile
+
+      - name: Set up our JDK environment
+        if: inputs.build_platform != 'ios'
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Cache Gradle Wrapper
+        if: inputs.build_platform != 'ios'
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+
+      - name: Cache Gradle Dependencies
+        if: inputs.build_platform != 'ios'
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-caches-
+
+      - name: Make Gradlew Executable
+        if: inputs.build_platform != 'ios'
+        run: cd android && chmod +x ./gradlew
+
+      - name: Generate apk
+        if: inputs.build_platform != 'ios'
+        run: cd android && ./gradlew assembleRelease --no-daemon
+
+      - name: Upload artifact
+        if: inputs.build_platform != 'ios'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Release artifact
+          path: android/app/build/outputs/apk/release/app-release.apk
