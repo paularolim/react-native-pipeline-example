@@ -5,4 +5,5 @@ runs:
   using: 'composite'
   steps:
     - name: Run common
+      shell: bash
       run: echo "I'm on common configuration"

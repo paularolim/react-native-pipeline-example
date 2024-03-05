@@ -5,4 +5,5 @@ runs:
   using: 'composite'
   steps:
     - name: Run for Android
+      shell: bash
       run: echo "I'm on Android configuration"
