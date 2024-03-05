@@ -117,6 +117,7 @@ jobs:
         run: cd ios && pod install --repo-update && cd ..
 
       - name: Build iOS
+        if: inputs.build_platform != 'android'
         uses: yukiarrr/ios-build-action@v1.11.2
         with:
           project-path: ios/PipelineExample.xcodeproj
