@@ -87,9 +87,53 @@ jobs:
         if: inputs.build_platform != 'ios'
         run: cd android && ./gradlew assembleRelease --no-daemon
 
-      - name: Upload artifact
+      - name: Upload Android artifact
         if: inputs.build_platform != 'ios'
         uses: actions/upload-artifact@v4
         with:
-          name: Release artifact
+          name: ${{ github.ref_name }}-${{ github.workflow_ref }}
           path: android/app/build/outputs/apk/release/app-release.apk
+
+      - name: Setup ruby
+        if: inputs.build_platform != 'android'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+          bundler-cache: true
+
+      - name: Cache cocoapods
+        if: inputs.build_platform != 'android'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ios/Pods
+            ~/Library/Caches/CocoaPods
+            ~/.cocoapods
+          key: ${{ runner.os }}-pods--${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: ${{ runner.os }}-pods-
+
+      - name: Install pod dependencies
+        if: inputs.build_platform != 'android'
+        run: cd ios && pod install --repo-update && cd ..
+
+      - name: Build iOS
+        uses: yukiarrr/ios-build-action@v1.11.2
+        with:
+          project-path: ios/PipelineExample.xcodeproj
+          p12-base64: ${{ secrets.P12_BASE64 }}
+          mobileprovision-base64: ${{ secrets.MOBILEPROVISION_BASE64 }}
+          code-signing-identity: 'iOS Distribution'
+          team-id: ${{ secrets.TEAM_ID }}
+          certificate-password: ${{ secrets.CERTIFICATE_PASSWORD }}
+          workspace-path: ios/PipelineExample.xcworkspace
+          export-method: development
+          configuration: Release
+          scheme: PipelineExample
+          output-path: ${{ github.ref_name }}-${{ github.workflow_ref }}.ipa
+
+      - name: Upload iOS artifact
+        if: inputs.build_platform != 'android'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.ref_name }}-${{ github.workflow_ref }}
+          path: ${{ github.ref_name }}-${{ github.workflow_ref }}.ipa
