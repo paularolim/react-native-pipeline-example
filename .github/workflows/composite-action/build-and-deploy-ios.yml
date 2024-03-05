@@ -1,0 +1,8 @@
+name: iOS configuration
+description: Run jobs for iOS
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Run for iOS
+      run: echo 'I'm on iOS configuration'

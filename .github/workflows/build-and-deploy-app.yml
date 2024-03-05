@@ -1,0 +1,38 @@
+name: Build and deploy app (Android/iOS)
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_platform:
+        description: 'Choose if the action build for Android, iOS or both'
+        default: 'both'
+        type: choice
+        options:
+          - 'android'
+          - 'ios'
+          - 'both'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy-app:
+    name: Build and deploy app (Android/iOS)
+
+    runs-on: ${{ inputs.build_platform == 'android' && 'ubuntu-latest' || 'macOS-latest' }}
+
+    environment:
+      name: ${{ (github.ref_name == 'main') && 'production' || 'development' }}
+
+    steps:
+      - name: Run for common platforms
+        uses: ./.github/workflows/composite-action/build-and-deploy-common.yml
+
+      - name: Run for Android
+        if: inputs.build_platform != 'ios'
+        uses: ./.github/workflows/composite-action/build-and-deploy-android.yml
+
+      - name: Run for iOS
+        if: inputs.build_platform != 'android'
+        uses: ./.github/workflows/composite-action/build-and-deploy-ios.yml

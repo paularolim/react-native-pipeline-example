@@ -1,0 +1,8 @@
+name: Android configuration
+description: Run jobs for Android
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Run for Android
+      run: echo 'I'm on Android configuration'
